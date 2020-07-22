@@ -1,0 +1,1 @@
+# has-useful-tests-action
