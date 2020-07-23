@@ -1,0 +1,13 @@
+name: 'Has useful tests'
+description: 'Validate that tests from the PR are useful by running them without the code from the PR and expecting them to fail.'
+author: 'Frederic Lepied'
+branding:
+  icon: eye
+  color: blue
+inputs:
+  run-tests:
+    description: 'A command to run your tests, within the repository.'
+    default: '.github/run-tests'
+runs:
+  using: 'node12'
+  main: 'index.js'
