@@ -22,7 +22,7 @@ git diff $start..HEAD -- **/*test* > fdiff.$$
 # No test
 if [ ! -s fdiff.$$ ]; then
     echo "No test"
-    if [ -z "$(sed -n -e 's/^+++ //p' < diff.$$ | egrep -v '/doc/|.*\.pot?$|.*\.(rst|txt|md)$')" ]; then
+    if [ -z "$(sed -n -e 's/^+++ //p' < diff.$$ | egrep -vi 'readme|/doc/|.*\.pot?$|.*\.(rst|txt|md|sample)$')" ]; then
 	echo "Only doc"
         exit 0
     else
