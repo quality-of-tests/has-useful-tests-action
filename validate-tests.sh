@@ -11,6 +11,9 @@ cleanup() {
     rm -f diff.$$ fdiff.$$
 }
 
+pwd
+env
+
 end=$(git rev-list --simplify-by-decoration -2 HEAD|head -1)
 start=$(git rev-list --simplify-by-decoration -2 HEAD|tail -1)
 
