@@ -9,10 +9,6 @@ try {
   const cmdline = core.getInput('run-tests') || '.github/run-tests';
   console.log(`run-tests=${cmdline}`);
   var dirName = path.dirname(__filename);
-
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
   
   // check that the command is executable and if ok launch it
   const cmd = cmdline.split(' ')[0];
