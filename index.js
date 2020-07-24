@@ -10,7 +10,6 @@ try {
 
   // `run-tests` input defined in action metadata file
   const cmdline = core.getInput('run-tests') || '.github/run-tests';
-  console.log(`run-tests=${cmdline}`);
 
   // launch the command through validate-tests.sh and exit 1 in case
   // of error
