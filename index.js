@@ -5,17 +5,15 @@ const path = require('path');
 const fs = require('fs');
 
 try {
-  // display the current sha1
+  // get the directory name to be able to launch validate-tests.sh
   var dirName = path.dirname(__filename);
-  exec.exec(`bash -c "set -x; cd ${dirName}; git rev-parse HEAD"`);
 
   // `run-tests` input defined in action metadata file
   const cmdline = core.getInput('run-tests') || '.github/run-tests';
   console.log(`run-tests=${cmdline}`);
-  
-  // check that the command is executable and if ok launch it
-  const cmd = cmdline.split(' ')[0];
 
+  // launch the command through validate-tests.sh and exit 1 in case
+  // of error
   (async () => {
     await exec.exec(`${dirName}/validate-tests.sh ${cmdline}`).catch(error => {process.exit(1)});   
   });
