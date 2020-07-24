@@ -14,9 +14,7 @@ try {
 
   // launch the command through validate-tests.sh and exit 1 in case
   // of error
-  (async () => {
-    await exec.exec(`${dirName}/validate-tests.sh ${cmdline}`).catch(error => {process.exit(1)});   
-  });
+  exec.exec(`${dirName}/validate-tests.sh ${cmdline}`).catch(error => {process.exit(1)});
 }
 catch (error) {
   core.setFailed(error.message);
