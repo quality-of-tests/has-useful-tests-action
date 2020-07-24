@@ -16,11 +16,9 @@ try {
   // check that the command is executable and if ok launch it
   const cmd = cmdline.split(' ')[0];
 
-  try {
-    exec.exec(`${dirName}/validate-tests.sh ${cmdline}`);
-  } catch(error) {
-    process.exit(1);
-  }
+  (async () => {
+    await exec.exec(`${dirName}/validate-tests.sh ${cmdline}`).catch(error => {process.exit(1)});   
+  });
 }
 catch (error) {
   core.setFailed(error.message);
