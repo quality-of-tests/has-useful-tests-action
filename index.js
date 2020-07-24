@@ -16,18 +16,11 @@ try {
   // check that the command is executable and if ok launch it
   const cmd = cmdline.split(' ')[0];
 
-  fs.access(cmd, fs.constants.X_OK, (err) => {
-    if (!err) {
-      try {
-        exec.exec(`${dirName}/validate-tests.sh ${cmdline}`);
-      } catch(error) {
-        process.exit(1);
-      }
-    } else {
-      core.setFailed(`${cmd} is not executable`);
-      process.exit(2);
-    }
-  });
+  try {
+    exec.exec(`${dirName}/validate-tests.sh ${cmdline}`);
+  } catch(error) {
+    process.exit(1);
+  }
 }
 catch (error) {
   core.setFailed(error.message);
