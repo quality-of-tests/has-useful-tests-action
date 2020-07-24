@@ -49,8 +49,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
+      with:
+        fetch-depth: 0
+    - name: Run your tests
+      run: make tests
     - name: Validate Tests
       uses: quality-of-tests/has-useful-tests-action@master
+      with:
+        run-tests: make tests
 ```
 
-This example will run the default run-tests, `.github/run-tests`, every time a pull-request is created, edited, or updated.
+This example will run the `make tests`, every time a pull-request is
+created, edited, or updated. It will be run first to validate that the
+change and then run the tests without the code expecting them to
+fail. The checkout code step must be called with `fetch-depth: 0` to
+have all the git refs to compute the change.

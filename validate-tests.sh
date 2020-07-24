@@ -19,19 +19,27 @@ if [ "$1" = '-v' ]; then
     env
 fi
 
-end=$(git rev-list --simplify-by-decoration -2 HEAD|head -1)
-start=$(git rev-list --simplify-by-decoration -2 HEAD|tail -1)
+mainbranch=$(LC_ALL=C git remote show origin | grep "HEAD branch" | cut -d ":" -f 2 | tr -d ' ')
+
+if [ -n "$mainbranch" ]; then
+    mainbranch="origin/$mainbranch"
+else
+    mainbranch=origin/master
+fi
+
+end=$(git rev-parse --abbrev-ref HEAD)
+start=$(git merge-base $end $mainbranch)
 
 trap cleanup 0
 
 git diff $start..HEAD > diff.$$
-git diff $start..HEAD -- **/*test* > fdiff.$$
+git diff $start..HEAD -- '**/*test*' > fdiff.$$
 
 # No test
 if [ ! -s fdiff.$$ ]; then
     echo "No test"
-    if [ -z "$(sed -n -e 's/^+++ //p' < diff.$$ | egrep -vi 'readme|/doc/|.*\.pot?$|.*\.(rst|txt|md|sample)$')" ]; then
-	echo "Only doc -> good."
+    if [ -z "$(sed -n -e 's/^+++ //p' < diff.$$ | egrep -vi 'changelog|readme|/doc/|.*\.pot?$|.*\.(rst|txt|md|sample)$|makefile|Dockerfile|docker-compose\.y|(^|/)\..+')" ]; then
+	echo "Only doc/build/infra -> good."
         exit 0
     else
 	echo "Code without test -> not good."
@@ -52,13 +60,15 @@ else
 fi
 
 # Checking with the tests from the changeset without any code
-patch -p0 < fdiff.$$
+patch -p1 < fdiff.$$
 
 # Test should fail to validate that it is testing changes from the new
 # code that is not present
 if ! "$@"; then
+    echo "Tests are failing -> good"
     ret=0
 else
+    echo "Tests are not failing -> bad"
     ret=1
 fi
 
