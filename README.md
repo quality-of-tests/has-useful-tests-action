@@ -49,8 +49,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
-      with:
-        fetch-depth: 0
     - name: Run your tests
       run: make tests
     - name: Validate Tests
@@ -60,7 +58,19 @@ jobs:
 ```
 
 This example will run the `make tests`, every time a pull-request is
-created, edited, or updated. It will be run first to validate that the
+created, edited, or updated. It will be run first to validate the
 change and then run the tests without the code expecting them to
-fail. The checkout code step must be called with `fetch-depth: 0` to
-have all the git refs to compute the change.
+fail.
+
+## Advanced configuration
+
+If you want to debug the action, set verbose to true. In our example,
+it would be like that:
+
+```yml
+    - name: Validate Tests
+      uses: quality-of-tests/has-useful-tests-action@master
+      with:
+        run-tests: make tests
+        verbose: true
+```

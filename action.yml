@@ -8,6 +8,9 @@ inputs:
   run-tests:
     description: 'A command to run your tests, within the repository.'
     default: '.github/run-tests'
+  verbose:
+    description: 'Set to true to get verbose output'
+    default: false
 runs:
   using: 'node12'
   main: 'index.js'

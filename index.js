@@ -11,6 +11,9 @@ try {
   // `run-tests` input defined in action metadata file
   const cmdline = core.getInput('run-tests') || '.github/run-tests';
 
+  // `verbose` input defined in action metadata file
+  process.env.VERBOSE = core.getInput('verbose');
+
   // launch the command through validate-tests.sh and exit 1 in case
   // of error
   exec.exec(`${dirName}/validate-tests.sh ${cmdline}`).catch(error => {process.exit(1)});
