@@ -57,7 +57,7 @@ git diff --no-prefix $start..$sha -- '**/*test*' > fdiff.$$
 # No test
 if [ ! -s fdiff.$$ ]; then
     echo "No test"
-    if [ -z "$(sed -n -e 's/^+++ //p' < diff.$$ | egrep -vi 'changelog|readme|/doc/|.*\.pot?$|.*\.(rst|txt|md|sample)$|makefile|Dockerfile|docker-compose\.y|(^|/)\..+')" ]; then
+    if [ -z "$(sed -n -e 's/^+++ //p' < diff.$$ | egrep -vi 'changelog|readme|/doc/|.*\.pot?$|.*\.(rst|txt|md|sample)$|makefile|Dockerfile|docker-compose\.y|package.*\.json|yarn\.lock|(^|/)\..+')" ]; then
 	echo "Only doc/build/infra -> good."
         exit 0
     else
