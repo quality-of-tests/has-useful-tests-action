@@ -7,6 +7,7 @@ ret=0
 cleanup() {
     set +e
     git checkout . >& /dev/null
+    git clean -df  >& /dev/null
     git checkout $end >& /dev/null || git checkout $sha >& /dev/null
     rm -f diff.$$ fdiff.$$
 }
@@ -26,6 +27,14 @@ if [ -n "$GITHUB_EVENT_PATH" ]; then
     baseref=$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")
 fi
 
+if git log -1 | grep -qi "^\s*Change-Id:\s*.*"; then
+    gerrit=1
+    remote=gerrit
+else
+    gerrit=
+    remote=origin
+fi
+
 if [ -n "$GITHUB_HEAD_REF" ]; then
     end=$GITHUB_HEAD_REF
 else
@@ -34,25 +43,34 @@ fi
 
 sha=$(git rev-parse HEAD)
 
-echo "Fetching origin $end..."
-git fetch origin $end
+if [ -z "$gerrit" ]; then
+    echo "Fetching $remote $end..."
+    git fetch $remote $end
 
-echo "Fetching origin $baseref..."
+    echo "Fetching $remote $baseref..."
 
-if [ -n "$baseref" -a "$baseref" != 'null' ]; then
-    git fetch origin $baseref
-    basebranch="$baseref"
+    if [ -n "$baseref" -a "$baseref" != 'null' ]; then
+        git fetch $remote $baseref
+        basebranch="$baseref"
+    else
+        git fetch $remote master
+        basebranch=master
+    fi
+
+    start=$(git merge-base $basebranch $end || git merge-base $remote/$basebranch $remote/$end)
+
+    trap cleanup 0
+
+    git diff --no-prefix $start..$sha > diff.$$
+    git diff --no-prefix $start..$sha -- '**/*test*' > fdiff.$$
 else
-    git fetch origin master
-    basebranch=master
+    trap cleanup 0
+
+    git show --no-prefix > diff.$$
+    git diff --no-prefix HEAD^..HEAD -- '**/*test*' > fdiff.$$
+
+    start=HEAD^
 fi
-
-start=$(git merge-base $basebranch $end || git merge-base origin/$basebranch origin/$end)
-
-trap cleanup 0
-
-git diff --no-prefix $start..$sha > diff.$$
-git diff --no-prefix $start..$sha -- '**/*test*' > fdiff.$$
 
 # No test
 if [ ! -s fdiff.$$ ]; then
@@ -83,6 +101,7 @@ patch -p0 < fdiff.$$
 
 # Test should fail to validate that it is testing changes from the new
 # code that is not present
+echo "Running tests: $@..."
 if ! "$@"; then
     echo "Tests are failing -> good"
     ret=0
